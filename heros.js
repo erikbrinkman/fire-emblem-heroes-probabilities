@@ -75,7 +75,7 @@ function readCharacters() {
 
 function parseFocusEvent(event) {
     const name = event.querySelector('th').textContent.trim().toLowerCase().replace(/^grand battle/, 'battling');
-    const img = '//feheroes.wiki/images' + event.querySelector('img').attributes.src.value.match(/^\/images\/thumb(.*\.png)\//)[1];
+    const img = '//feheroes.wiki' + event.querySelector('img').attributes.srcset.value.split(', ').map(x => x.split(' ')).filter(([_, z]) => z === '1.5x')[0][0];
     return [name, img];
 }
 
@@ -150,7 +150,7 @@ function process() {
     console.log(JSON.stringify({
         rarities: categories,
         colors: colors,
-        events: data.events}));
+        events: data.events}, null, 2));
 }
 
 readCharacters();
