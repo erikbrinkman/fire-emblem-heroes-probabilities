@@ -25,8 +25,13 @@
     position: absolute;
     padding: 1rem;
     width: 100%;
+    box-sizing: border-box;
     left: 0;
     bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.card .mdl-card__menu {
     background-color: rgba(255, 255, 255, 0.8);
 }
 

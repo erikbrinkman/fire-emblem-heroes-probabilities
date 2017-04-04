@@ -18,12 +18,23 @@
             <header class="mdl-layout__header">
                 <div class="mdl-layout__header-row">
                     <span class="mdl-layout-title">Fire Emblem Heroes Conditional Probabilities</span>
+                    <div class="mdl-layout-spacer"></div>
+
+                    <button id="info-menu"
+                            class="mdl-button mdl-js-button mdl-button--icon">
+                        <i class="material-icons">help_outline</i>
+                    </button>
+
+                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                        for="info-menu">
+                        <li class="mdl-menu__item" disabled>Arrows at the top of a card adjust 5★ probability</li>
+                        <li class="mdl-menu__item" onclick="window.open('//fireemblemwiki.org');">Event heroes and times come from fireemblemwiki.org</li>
+                        <li class="mdl-menu__item" onclick="window.open('//feheroes.wiki')">Hero colors and event images come from feheroes.wiki</li>
+                    </ul>
                 </div>
             </header>
             <main class="mdl-layout__content">
-            <div class="page-content">
-                <!--<div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active"></div>-->
-            </div>
+            <div class="page-content"></div>
             </main>
         </div>
     </body>

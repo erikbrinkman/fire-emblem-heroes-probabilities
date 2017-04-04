@@ -32,78 +32,93 @@
         var headerPictures = [];
 
         data.events.forEach((event, i) => {
-            const card = document.createElement('div');
-            card.classList.add('mdl-card');
-            card.classList.add('mdl-shadow--2dp');
-            card.classList.add('card');
-            const headerDiv = document.createElement('div');
-            headerDiv.classList.add('mdl-card__title');
+            const template = document.createElement('template');
+            template.innerHTML = `<div class="mdl-card mdl-shadow--2dp card">
+            <div class="mdl-card__title card-header"><h2 class="mdl-card__title-text">${event.name}</h2></div>
+            <div class="mdl-card__supporting-text">Ran from ${new Date(event.start).toLocaleString()} to ${new Date(event.end).toLocaleString()}</div>
+            <div class="mdl-card__menu">
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+            <i class="material-icons">chevron_left</i>
+            </button>
+            <button class="mdl-button mdl-js-button mdl-js-ripple-effect"></button>
+            <button class="mdl-button mdl-button--icon mdl-js-button mdl-js-ripple-effect">
+            <i class="material-icons">chevron_right</i>
+            </button>
+            </div>
+            <table class="mdl-card__media mdl-data-table mdl-js-data-table">
+            <thead><tr>
+            <th class="mdl-data-table__cell--non-numeric">Rarity</th>
+            ${colors.map(x => '<th>' + x + '</th>').join('')}
+            </tr></thead>
+            <tbody>
+            <tr>
+            <td class="mdl-data-table__cell--non-numeric">5★ Total</td>
+            ${'<td></td>'.repeat(colors.length)}
+            </tr>
+            ${rarities.map(r => '<tr><td class="mdl-data-table__cell--non-numeric">' + r + '</td>' + '<td></td>'.repeat(colors.length) + '</tr>').join('')}
+            </tbody>
+            </table>
+            </div>`
+            const card = template.content.firstChild;
             // The wiki server doesn't like loading too many of these
-            headerPictures.push([headerDiv, event.img]);
-            const header = document.createElement('h2');
-            header.classList.add('mdl-card__title-text');
-            header.textContent = event.name;
-            headerDiv.appendChild(header);
-            card.appendChild(headerDiv);
+            headerPictures.push([card.querySelector('.card-header'), event.img]);
 
-            const subText = document.createElement('div');
-            subText.classList.add('mdl-card__supporting-text');
-            subText.textContent = `Ran from ${new Date(event.start).toLocaleString()} to ${new Date(event.end).toLocaleString()}`;
-            card.appendChild(subText);
+            var level = 0;
+            const counts = event.count;
+            const [down, reset, up] = card.querySelectorAll('.mdl-card__menu > button');
+            const [total, ...buckets] = card.querySelectorAll('tbody > tr');
 
-            const table = document.createElement('table');
-            table.classList.add('mdl-card__media');
-            table.classList.add('mdl-data-table');
-            table.classList.add('mdl-js-data-table');
+            function update() {
+                level = Math.min(Math.max(0, level), 188);
+                if (level) {
+                    down.removeAttribute('disabled');
+                    reset.removeAttribute('disabled');
+                } else {
+                    down.setAttribute('disabled', '');
+                    reset.setAttribute('disabled', '');
+                }
+                if (level == 188) {
+                    up.setAttribute('disabled', '');
+                } else {
+                    up.removeAttribute('disabled');
+                }
 
-            const tableHead = document.createElement('thead');
-            const headRow = document.createElement('tr');
-            const firstHead = document.createElement('th');
-            firstHead.classList.add('mdl-data-table__cell--non-numeric');
-            firstHead.textContent = 'Rarity';
-            headRow.appendChild(firstHead);
-            colors.forEach(color => {
-                const col = document.createElement('th');
-                col.textContent = color;
-                headRow.appendChild(col);
-            });
-            tableHead.appendChild(headRow);
-            table.appendChild(tableHead);
+                const prob5 = (3 + level * 0.25) / 100;
+                reset.textContent = (prob5 * 100).toFixed(2) + '%';
+                const prob4 = 0.36 * (1 - prob5 * 2) / 0.94;
+                const probs = [prob5, prob5, prob4, 1 - prob5 * 2 - prob4];
 
-            const tableBody = document.createElement('tbody');
-
-            const fiveProbs = event.condProbs[0].map((_, i) => event.condProbs[0][i] + event.condProbs[1][i]);
-            const fiveRow = document.createElement('tr');
-            const firstFiveElem = document.createElement('td');
-            firstFiveElem.classList.add('mdl-data-table__cell--non-numeric');
-            firstFiveElem.textContent = '5★ Total';
-            fiveRow.appendChild(firstFiveElem);
-            fiveProbs.forEach(prob => {
-                const elem = document.createElement('td');
-                elem.textContent = (prob * 100).toPrecision(3) + '%';
-                fiveRow.appendChild(elem);
-            });
-            tableBody.append(fiveRow);
-
-            event.condProbs.forEach((probs, i) => {
-                const tableRow = document.createElement('tr');
-                const firstElem = document.createElement('td');
-                firstElem.classList.add('mdl-data-table__cell--non-numeric');
-                firstElem.textContent = rarities[i];
-                tableRow.appendChild(firstElem);
-
-                probs.forEach(prob => {
-                    const elem = document.createElement('td');
-                    elem.textContent = (prob * 100).toPrecision(3) + '%';
-                    tableRow.appendChild(elem);
+                const joint = counts.map((count, i) => {
+                    const sum = count.reduce((a, b) => a + b);
+                    return count.map(c => c * probs[i] / sum);
                 });
-                tableBody.appendChild(tableRow);
-            });
-            table.appendChild(tableBody);
-            card.appendChild(table);
+                const z = joint[0].map((_, i) => joint.map(r => r[i]).reduce((a, b) => a + b));
+                const condProbs = joint.map(row => row.map((c, i) => c / z[i]));
+                const total5star = condProbs[0].map((_, i) => condProbs[0][i] + condProbs[1][i]);
+                total5star.forEach((p, i) => {
+                    total.children[i + 1].textContent = (p * 100).toFixed(2) + '%';
+                });
+                condProbs.forEach((probs, i) => probs.forEach((p, j) => {
+                    buckets[i].children[j + 1].textContent = (p * 100).toFixed(2) + '%';
+                }));
+            }
 
-            componentHandler.upgradeElement(card);
-            content.appendChild(card);
+            down.addEventListener('click', _ => {
+                level--;
+                update();
+            });
+            reset.addEventListener('click', _ => {
+                level = 0;
+                update();
+            });
+            up.addEventListener('click', _ => {
+                level++;
+                update();
+            });
+
+            update();
+            componentHandler.upgradeElement(template);
+            content.appendChild(template.content.firstChild);
         })
 
         function updateImage([elem, url]) {

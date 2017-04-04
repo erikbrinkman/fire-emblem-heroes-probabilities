@@ -6,7 +6,5 @@ A website displaying the probabilities of drawing five star heroes conditional o
 Running
 -------
 
-`npm run gen` will create `data.json` with the conditional probabilities.
-
-`npm run print` or `npm run print5` will print the probabilities to stdout.
-These both require `jq`.
+`npm run gen` will create `data.json` with the counts for each color in each star level..
+This file is used by the website to compute the conditional probabilities.

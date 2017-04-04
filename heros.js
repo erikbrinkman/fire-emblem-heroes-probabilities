@@ -3,11 +3,8 @@ const https = require('https');
 const jsdom = require('jsdom').jsdom;
 
 const categories = ['5★ Focus', '5★', '4★', '3★'];
-const probs = [0.03, 0.03, 0.36, 0.58]; // TODO Handle improved probs
 const colors = ['Red', 'Green', 'Blue', 'Neutral'];
 const data = {};
-
-// FIXME Handle errors
 
 function normalize(name) {
     return name.trim().toLowerCase()
@@ -20,6 +17,10 @@ function normalize(name) {
 
 function readEvents(colorMap) {
     jsdom.env('https://fireemblemwiki.org/wiki/List_of_summoning_events_in_Fire_Emblem_Heroes', (err, window) => {
+        if (err) {
+            throw err;
+        }
+
         const events = [];
 
         window.document.querySelectorAll('#mw-content-text > h3').forEach(header => {
@@ -58,6 +59,10 @@ function readEvents(colorMap) {
 
 function readCharacters() {
     jsdom.env('https://feheroes.wiki/Hero_List', (err, window) => {
+        if (err) {
+            throw err;
+        }
+
         const colorMap = {};
         window.document.querySelectorAll('tr').forEach((row, i) => {
             if (i) {
@@ -93,6 +98,10 @@ function readFocusLists() {
     }
 
     jsdom.env('https://feheroes.wiki/Summoning_Focus_List', (err, window) => {
+        if (err) {
+            throw err;
+        }
+
         window.document.querySelectorAll('table').forEach(event => {
             const [name, img] = parseFocusEvent(event);
             images[name] = img;
@@ -102,6 +111,10 @@ function readFocusLists() {
     });
 
     jsdom.env('https://feheroes.wiki/Summoning_Focus_Archive', (err, window) => {
+        if (err) {
+            throw err;
+        }
+
         window.document.querySelectorAll('table').forEach(event => {
             const [name, img] = parseFocusEvent(event);
             images[name] = img;
@@ -116,34 +129,38 @@ function process() {
         return;
     }
 
+    var error = false;
+
     data.events.forEach(event => {
-        const joint = event.names.map((names, i) => {
+        event.count = event.names.map((names, i) => {
             const count = colors.map(_ => 0);
             names.forEach(name => {
                 const color = data.colorMap[name];
                 if (color === undefined) {
                     console.error(`couldn't find color of "${name}"`);
+                    error = true;
                 } else {
                     count[color] += 1;
                 }
             });
-            const p = probs[i];
-            const sum = count.reduce((a, b) => a + b);
-            return count.map(x => x * p / sum);
+            return count;
         });
-        const z = joint[0].map((_, i) => joint.map(r => r[i]).reduce((a, b) => a + b));
-        event.condProbs = joint.map(row => row.map((c, i) => c / z[i]));
 
         const lookupName = event.name.replace(/^.*: /, '').toLowerCase();
         const image = data.images[lookupName];
         if (image === undefined) {
             console.error(`couldn't find event named "${lookupName}"`);
+            error = true;
         } else {
             event.img = image;
         }
 
         event.names = undefined;
     });
+
+    if (error) {
+        throw "missing data while parsing";
+    }
     
     data.events.sort((a, b) => { const e = b.end - a.end; return e === 0 ? b.start - a.start : e});
 

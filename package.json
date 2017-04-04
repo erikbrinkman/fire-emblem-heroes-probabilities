@@ -5,8 +5,6 @@
   "main": "heros.js",
   "scripts": {
     "gen" : "node heros.js > data.json",
-    "print": "jq -r '(.rarities | map(.[:4])) as $cats | .colors as $cols | .events[] | .name, \"=\" * (.name | length), ([\"\"] + $cols | join(\"\\t\")), ([$cats, .condProbs] | transpose | .[] | [.[0]] + (.[1] | map(. * 100 | tostring | .[:6] + \"%\")) | join(\"\\t\")), \"\"' data.json",
-    "print5" : "jq -r '(.rarities | map(.[:4])) as $cats | .colors as $cols | .events[] | .name, \"=\" * (.name | length), ([$cols, (.condProbs[:2] | transpose | map(add | . * 100 | tostring | .[:6] + \"%\"))] | transpose | .[] | join(\"\\t\")), \"\"' data.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Erik Brinkman",
