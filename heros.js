@@ -162,7 +162,7 @@ function process() {
         throw "missing data while parsing";
     }
     
-    data.events.sort((a, b) => { const e = b.end - a.end; return e === 0 ? b.start - a.start : e});
+    data.events.sort((a, b) => (Math.sign(b.end - a.end) << 2) + (Math.sign(b.start - a.start) << 1) + Math.sign(a.name.localeCompare(b.name)));
 
     console.log(JSON.stringify({
         rarities: categories,
