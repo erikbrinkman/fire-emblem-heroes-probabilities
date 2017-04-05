@@ -45,6 +45,102 @@
       "img": "//feheroes.wiki/images/thumb/b/bf/Banner_Focus_Spring_Festival.png/600px-Banner_Focus_Spring_Festival.png"
     },
     {
+      "name": "Focus: Pegasus Knights",
+      "start": "2017-04-03T07:00:00.000Z",
+      "end": "2017-04-11T07:00:00.000Z",
+      "count": [
+        [
+          1,
+          0,
+          3,
+          0
+        ],
+        [
+          19,
+          9,
+          13,
+          12
+        ],
+        [
+          26,
+          15,
+          19,
+          23
+        ],
+        [
+          15,
+          9,
+          12,
+          13
+        ]
+      ],
+      "img": "//feheroes.wiki/images/thumb/a/a7/Banner_Focus_Pegasus_Knights.png/600px-Banner_Focus_Pegasus_Knights.png"
+    },
+    {
+      "name": "Focus: Wyvern Riders",
+      "start": "2017-04-03T07:00:00.000Z",
+      "end": "2017-04-11T07:00:00.000Z",
+      "count": [
+        [
+          0,
+          4,
+          0,
+          0
+        ],
+        [
+          19,
+          9,
+          13,
+          12
+        ],
+        [
+          26,
+          15,
+          19,
+          23
+        ],
+        [
+          15,
+          9,
+          12,
+          13
+        ]
+      ],
+      "img": "//feheroes.wiki/images/thumb/8/80/Banner_Focus_Wyvern_Riders.png/600px-Banner_Focus_Wyvern_Riders.png"
+    },
+    {
+      "name": "Focus: Battling Navarre",
+      "start": "2017-04-04T07:00:00.000Z",
+      "end": "2017-04-09T07:00:00.000Z",
+      "count": [
+        [
+          2,
+          0,
+          1,
+          1
+        ],
+        [
+          19,
+          9,
+          13,
+          12
+        ],
+        [
+          26,
+          15,
+          19,
+          23
+        ],
+        [
+          15,
+          9,
+          12,
+          13
+        ]
+      ],
+      "img": "//feheroes.wiki/images/thumb/f/f2/Banner_Focus_Battling_Navarre.png/600px-Banner_Focus_Battling_Navarre.png"
+    },
+    {
       "name": "New Heroes: Blazing Shadows",
       "start": "2017-03-14T07:00:00.000Z",
       "end": "2017-03-30T07:00:00.000Z",
