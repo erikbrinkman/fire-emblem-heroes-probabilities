@@ -1,7 +1,7 @@
 Fire Emblem Heroes Probabilities
 ================================
 
-A website displaying the probabilities of drawing five star heroes conditional on color.
+A [website](//erikbrinkman.github.io/fire_emblem_heroes_probabilities) displaying the probabilities of drawing five star heroes conditional on color.
 
 Running
 -------
