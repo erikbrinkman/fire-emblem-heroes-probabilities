@@ -13,6 +13,38 @@
   ],
   "events": [
     {
+      "name": "New Heroes: World of Shadows",
+      "start": "2017-04-14T07:00:00.000Z",
+      "end": "2017-04-26T07:00:00.000Z",
+      "count": [
+        [
+          1,
+          0,
+          2,
+          1
+        ],
+        [
+          19,
+          9,
+          13,
+          12
+        ],
+        [
+          26,
+          15,
+          19,
+          23
+        ],
+        [
+          15,
+          9,
+          12,
+          13
+        ]
+      ],
+      "img": "//feheroes.wiki/images/thumb/e/e4/Banner_Focus_World_of_Shadows.png/413px-Banner_Focus_World_of_Shadows.png"
+    },
+    {
       "name": "Spring Festival",
       "start": "2017-03-30T07:00:00.000Z",
       "end": "2017-04-14T07:00:00.000Z",
