@@ -11,7 +11,7 @@ function normalize(name) {
         .replace(/ \(male\)$/, ' (m)')
         .replace(/ \(female\)$/, ' (f)')
         .replace(/ \(mystery of the emblem\)$/, ' (young)')
-        .replace(/ \(awakening\)$/, '')
+        .replace(/ \(awakening\)$/, ' (adult)')
         .replace(/ \(rabbit\)$/, ' (spring festival)');
 }
 
@@ -27,12 +27,19 @@ function readEvents(colorMap) {
             if (header.textContent !== 'Characters') {
                 return;
             }
-            const time = header.previousElementSibling.textContent;
-            const matches = time.match(/ from (.*) on (.*) to (\d+)(.M UTC) on (.*)\./);
+
+            // FIXME Parse / handle special probabilities
+
+            let elem = header;
+            let matches = null;
+            while (!matches) {
+                elem = elem.previousElementSibling;
+                matches = elem.textContent.match(/ from (.*) on (.*) to (\d+)(.M UTC) on (.*)\./);
+            }
             const startMatches = (matches[1] === 'launch' ? '7AM UTC' : matches[1]).match(/^(\d+)(.M UTC)$/);
             const startTime = new Date(`${matches[2]} ${startMatches[1]}:00 ${startMatches[2]}`);
             const endTime = new Date(`${matches[5]} ${matches[3]}:00 ${matches[4]}`);
-            const name = header.previousElementSibling.previousElementSibling.textContent;
+            const name = elem.previousElementSibling.textContent;
             const names = categories.map(_ => []);
             var cat = -1;
 
@@ -64,7 +71,7 @@ function readCharacters() {
         }
 
         const colorMap = {};
-        window.document.querySelectorAll('tr').forEach((row, i) => {
+        window.document.querySelectorAll('table.wikitable tr').forEach((row, i) => {
             if (i) {
                 const cols = row.children;
                 const image = cols[4].querySelector('img').attributes.alt.value;
@@ -80,7 +87,7 @@ function readCharacters() {
 
 function parseFocusEvent(event) {
     const name = event.querySelector('th').textContent.trim().toLowerCase().replace(/^grand battle/, 'battling');
-    const img = '//feheroes.wiki' + event.querySelector('img').attributes.srcset.value.split(', ').map(x => x.split(' ')).filter(([_, z]) => z === '1.5x')[0][0];
+    const img = event.querySelector('img').attributes.src.value.replace(/thumb\//, '').replace(/\.png.*$/,'.png');
     return [name, img];
 }
 
@@ -88,7 +95,17 @@ function readFocusLists() {
     const images = {};
     var pages = 0;
 
-    function finalize() {
+    function process_focus(err, window) {
+        if (err) {
+            throw err;
+        }
+
+        window.document.querySelectorAll('table.wikitable').forEach(event => {
+            const [name, img] = parseFocusEvent(event);
+            images[name] = img;
+        });
+
+        pages++;
         if (pages < 2) {
             return;
         }
@@ -97,31 +114,8 @@ function readFocusLists() {
         process();
     }
 
-    jsdom.env('https://feheroes.wiki/Summoning_Focus_List', (err, window) => {
-        if (err) {
-            throw err;
-        }
-
-        window.document.querySelectorAll('table').forEach(event => {
-            const [name, img] = parseFocusEvent(event);
-            images[name] = img;
-        });
-        pages++;
-        finalize();
-    });
-
-    jsdom.env('https://feheroes.wiki/Summoning_Focus_Archive', (err, window) => {
-        if (err) {
-            throw err;
-        }
-
-        window.document.querySelectorAll('table').forEach(event => {
-            const [name, img] = parseFocusEvent(event);
-            images[name] = img;
-        });
-        pages++;
-        finalize();
-    });
+    jsdom.env('https://feheroes.wiki/Summoning_Focus_List', process_focus);
+    jsdom.env('https://feheroes.wiki/Summoning_Focus_Archive', process_focus);
 }
 
 function process() {
